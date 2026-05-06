@@ -7,4 +7,4 @@ The modules will be able to:
 - Test select functions of each library, especially specific functions that have failed in the past.
 - Etc...
 
-The modules will be able to run on a schedule and email interested parties when there are issues within an environment. 
+The modules can be run on a schedule and email interested parties when there are issues within an environment. 
