@@ -13,32 +13,45 @@
 #     Additional functionality tests confirm that selected libraries are able to
 #     perform basic operations, such as creating dataframes and geodataframes.
 #
-#     Logging is written to a log file only.Test failures are tracked using a 
-#     dictionary that records the test namevand one or more failure reasons. A 
-#     summary of any failures is written to the log file at the end of the test 
-#     run.
+#     Output is reported to terminal and written to a log file. Test failures are tracked
+#     and a summary of failures is provided at the end of the run.
 # ------------------------------------------------------------------------------
 # Improvements:
-#     Additional functionality tests can be added when/if needed.
+#   Additional functionality tests can be added when/if needed.
+
+#   Failure tracking could be expanded to include skipped tests or
+#   environment-specific warnings if required in the future.
+
+#   Logging output could be standardized further.
 #
-#     Failure tracking could be expanded to include skipped tests or
-#     environment-specific warnings if required in the future.
-#
-#     Logging output could be standardized further.
+#   Emails should be sent to those who want to be notified... (e.g. GeoPy+ leads and I.T. crew)
 # ------------------------------------------------------------------------------
 
-# *** IMPORTS ***
-# lets python interact with the system (file paths)
-import sys
-# built-in python testing tool
-import unittest
+# ** INTERNALS
+# pyright settings
+# --------------------------------------
+# pyright: reportUnusedImport=false
+# pyright: reportMissingImports=false
+# pyright: reportUnusedCallResult=false
+# pyright: reportUnknownMemberType=false
+# pyright: reportUnknownVariableType=false
+# --------------------------------------
 
-# *** LOGGING ***
+# *** IMPORTS ***
+import sys
+import unittest
 import logging
 from pathlib import Path
 
-# root directory of this script
-script_dir = Path(__file__).parent
+# *** CONFIGURATION ***
+GEOBC_LIBRARY_PATH = r"\\spatialfiles.bcgov\WORK\ilmb\dss\dsswhse\Resources\Scripts\Python\Library"
+sys.path.insert(0, GEOBC_LIBRARY_PATH)
+
+# *** LOGGING ***
+# Set up logging to report to terminal and a log file
+#TODO: Add a stream handler for the terminal
+
+script_dir = Path(__file__).parent # root directory of this script
 
 logger = logging.getLogger("main")
 logger.setLevel(logging.DEBUG)
@@ -72,33 +85,22 @@ def log_section(title: str):
     log(title, logging.INFO)
     log("=" * 78, logging.INFO)
 
-
-# *** CONFIGURATION ***
-# stores location of shared network folder
-GEOBC_LIBRARY_PATH = r"\\spatialfiles.bcgov\WORK\ilmb\dss\dsswhse\Resources\Scripts\Python\Library"
-
+# * PARAMS
 failure_tracking__dict = {}
 
-# *** IMPORTS AND CONFIGURATION ***
-log_section("IMPORTS AND CONFIGURATION")
-
-log("Checking GeoBC library path", logging.DEBUG)
-if GEOBC_LIBRARY_PATH not in sys.path:
-    sys.path.insert(0, GEOBC_LIBRARY_PATH)
-    log("GeoBC library path added to sys.path", logging.DEBUG)
-else:
-    log("GeoBC library path already present in sys.path", logging.DEBUG)
-
-# *** TEST CLASS 1: IMPORT TESTS ***
-# group of tests that see if libraries import
-class TestImports(unittest.TestCase):
+# *** TEST CLASSES ***
+class ImportTests(unittest.TestCase):
+    """
+    Import select libraries and report
+    Add to these tests as desired. Look at and follow the format of existing examples...
+    """
 
     @classmethod
     def setUpClass(cls):
         log_section("TEST CLASS #1 - IMPORT LIBRARIES")
         log("Beginning library import tests", logging.DEBUG)
 
-# tries to import pandas
+    # tries to import pandas
     def test_import_pandas(self):
         log("Testing import: pandas", logging.DEBUG)
         try:
@@ -111,7 +113,7 @@ class TestImports(unittest.TestCase):
             ).append("Failed to import pandas")
             self.fail("Failed to import pandas")
 
-# tries to import geopandas
+    # tries to import geopandas
     def test_import_geopandas(self):
         log("Testing import: geopandas", logging.DEBUG)
         try:
@@ -124,7 +126,7 @@ class TestImports(unittest.TestCase):
             ).append("Failed to import geopandas")
             self.fail("Failed to import geopandas")
 
-# tries to import matplotlib
+    # tries to import matplotlib
     def test_import_matplotlib(self):
         log("Testing import: matplotlib", logging.DEBUG)
         try:
@@ -137,7 +139,7 @@ class TestImports(unittest.TestCase):
             ).append("Failed to import matplotlib")
             self.fail("Failed to import matplotlib")
 
-# tries to import arcpy
+    # tries to import arcpy
     def test_import_arcpy(self):
         log("Testing import: arcpy", logging.DEBUG)
         try:
@@ -150,13 +152,13 @@ class TestImports(unittest.TestCase):
             ).append("ArcPy not available")
             self.fail("ArcPy not available")
 
-# tries to import excelwings (skips for now as it's not installed in my environment)
+    # tries to import excelwings (skips for now as it's not installed in my environment)
     @unittest.skip("excelwings not currently installed in this environment")
     def test_import_excelwings(self):
         log("Testing import: excelwings (skipped)", logging.DEBUG)
         __import__("excelwings")
 
-# tries to import custom GeoBC module 
+    # tries to import custom GeoBC module 
     def test_import_geobc(self):
         log("Testing import: geobc", logging.DEBUG)
         try:
@@ -169,15 +171,18 @@ class TestImports(unittest.TestCase):
             ).append("Failed to import geobc module")
             self.fail("Failed to import geobc module")
 
-# *** TEST CLASS 2: LIBRARY FUNCTIONS ***
-class TestFunctionality(unittest.TestCase):
+class FunctionTests(unittest.TestCase):
+    """
+    Test select functions of libraries
+    Add to these tests as desired. Look at and follow the format of existing examples...
+    """
 
     @classmethod
     def setUpClass(cls):
         log_section("TEST CLASS #2 - LIBRARY FUNCTIONALITY")
         log("Beginning functionality tests", logging.DEBUG)
 
-# tests that pandas is functional
+    # tests that pandas is functional
     def test_pandas_dataframe_creation(self):
         log("Testing pandas DataFrame creation", logging.DEBUG)
         import pandas as pd
@@ -187,7 +192,7 @@ class TestFunctionality(unittest.TestCase):
 
         self.assertEqual(len(df), 3)
 
-# tests that geopandas is functional
+    # tests that geopandas is functional
     def test_geopandas_geodataframe_creation(self):
         log("Testing GeoDataFrame creation with CRS", logging.DEBUG)
         import geopandas as gpd
@@ -203,7 +208,7 @@ class TestFunctionality(unittest.TestCase):
 
         self.assertEqual(len(gdf), 2)
 
-# tests that geopandas can read from the test file geodatabase
+    # tests that geopandas can read from the test file geodatabase
     def test_geopandas_can_read_test_geodatabase(self):
         log("Testing GeoPandas read from test geodatabase", logging.DEBUG)
 
@@ -226,18 +231,22 @@ class TestFunctionality(unittest.TestCase):
 
 # *** CONTROL TEST ORDER ***
 def load_tests(loader, tests, pattern):
-    """Ensure import tests run before functionality tests."""
+    """
+    Ensure import tests run before functionality tests.
+    Probably not needed since they should run in the order they are defined...
+    But leaving this in case it's helpful in the future    
+    """
     suite = unittest.TestSuite()
-    suite.addTests(loader.loadTestsFromTestCase(TestImports))
-    suite.addTests(loader.loadTestsFromTestCase(TestFunctionality))
+    suite.addTests(loader.loadTestsFromTestCase(ImportTests))
+    suite.addTests(loader.loadTestsFromTestCase(FunctionTests))
     return suite
 
 # *** TEST RUNNER ***
 if __name__ == "__main__":
     unittest.main(exit=False)
 
+    # Write summary report...
     log_section("TEST SUMMARY")
-
     if failure_tracking__dict:
         for test_name, issues in failure_tracking__dict.items():
             log(test_name, logging.INFO)
